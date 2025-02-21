@@ -35,7 +35,7 @@ jobs:
         run: echo "tag=${GITHUB_REF##*/}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Build & Push Docker Image
-        uses: axprueba/workflows/.github/actions/docker-build-push@master
+        uses: axprueba/workflows/actions/docker-build-push@master
         with:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}
