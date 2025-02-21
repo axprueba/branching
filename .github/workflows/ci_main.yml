@@ -49,9 +49,6 @@ jobs:
           echo "OLD_TAG=${{ vars.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.VERSION }}${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
           echo "NEW_TAG=${{ vars.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.VERSION }}" >> $GITHUB_ENV
 
-      - name: Docker login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin ${{ env.DOCKER_REGISTRY }}
-
       - name: Retag Docker Image
         run: |
           echo "Retageando imagen $OLD_TAG -> $NEW_TAG"

@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           image_name: ${{ env.IMAGE_NAME }}
-          tag: ${{ steps.get-version.outputs.VERSION }}
+          tag: ${{ env.VERSION }}
 
       - name: Build & Push Docker Image
         uses: axprueba/workflows/actions/docker-build-push@master
