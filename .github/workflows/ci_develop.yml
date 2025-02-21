@@ -36,17 +36,17 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_name || 'develop' }}
 
       - name: Docker login
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}/
 
       - name: Build Docker image
         run: |
-          echo "Building Docker image $DOCKER_REGISTRY${{ github.repository}}:dev-${{ github.sha }}"
-          docker build . -t $DOCKER_REGISTRY${{ github.repository}}:dev-${{ github.sha }}
+          echo "Building Docker image ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }}"
+          docker build . -t ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }}
         
       - name: Push Docker image
-        run: docker push $DOCKER_REGISTRY${{ github.repository}}:dev-${{ github.sha }}
+        run: docker push ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }}
         
       - name: Deploy to Dev
         run: |
-          echo "Desplegando imagen $DOCKER_REGISTRY${{ github.repository}}:dev-${{ github.sha }} a entorno de desarrollo"
+          echo "Desplegando imagen ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }} a entorno de desarrollo"
         
