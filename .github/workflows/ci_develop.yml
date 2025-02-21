@@ -47,7 +47,7 @@ jobs:
   build-and-push:
     secrets: inherit
     needs: initialize
-    uses: axprueba/workflows/.github/workflows/ci_build.yml@develop
+    uses: axprueba/workflows/.github/branching/ci_build.yml@develop
     with:
       image_url: ${{ needs.initialize.outputs.image_url }}
   
