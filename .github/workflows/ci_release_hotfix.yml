@@ -44,6 +44,22 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
+      # get version from VERSION.txt
+      - name: Get version from VERSION.txt
+        id: get-version
+        run: |
+          VERSION=$(cat VERSION.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Check if production docker image exists
+        uses: axprueba/workflows/actions/docker-check-if-image-exists@master
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          image_name: ${{ env.IMAGE_NAME }}
+          tag: ${{ steps.get-version.outputs.VERSION }}
+
       - name: Build & Push Docker Image
         uses: axprueba/workflows/actions/docker-build-push@master
         with:

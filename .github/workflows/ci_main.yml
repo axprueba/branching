@@ -21,28 +21,28 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Get version from VERSION.txt
+        id: get-version
+        run: |
+          VERSION=$(cat VERSION.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Extraer versión y tipo de rama
-        id: extract_version
         run: |
           BRANCH_REF="${{ github.event.pull_request.head.ref }}"
           echo "Head ref (rama origen del PR) es: $BRANCH_REF"
 
           if [[ "$BRANCH_REF" =~ ^release/ ]]; then
-            VERSION="${BRANCH_REF#release/}"
             TAG_SUFFIX="-rc"
 
           elif [[ "$BRANCH_REF" =~ ^hotfix/ ]]; then
-            VERSION="${BRANCH_REF#hotfix/}"
             TAG_SUFFIX="-hotfix"
 
           else
             echo "No es una rama release/* ni hotfix/* => no se extrae versión"
             exit 1
           fi
-
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
-          echo "Se extrajo versión: $VERSION con sufijo $TAG_SUFFIX"
 
       - name: Configurar variables de entorno
         run: |
