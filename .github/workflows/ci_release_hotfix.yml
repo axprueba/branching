@@ -32,10 +32,10 @@ jobs:
           echo "Branch ref: $BRANCH_REF"
 
           if [[ "$BRANCH_REF" =~ ^release/ ]]; then
-            TAG="${BRANCH_REF#release/}-rc-${CI_COMMIT_SHORT_SHA}"
+            TAG="${BRANCH_REF#release/}-rc-${{ github.sha }}"
             LATEST_TAG="${BRANCH_REF#release/}-rc-latest"
           elif [[ "$BRANCH_REF" =~ ^hotfix/ ]]; then
-            TAG="${BRANCH_REF#hotfix/}-hotfix-${CI_COMMIT_SHORT_SHA}"
+            TAG="${BRANCH_REF#hotfix/}-hotfix-${{ github.sha }}"
             LATEST_TAG="${BRANCH_REF#release/}-hotfix-latest"
           else
             echo "No es una rama release/* ni hotfix/* => Saliendo."
@@ -53,7 +53,7 @@ jobs:
           image_name: ${{ env.IMAGE_NAME }}
           tag: ${{ env.TAG }}
           
-      - name: Build & Push Docker Image
+      - name: Add latest tag to image
         uses: axprueba/workflows/actions/docker-retag@master
         with:
           registry: ${{ vars.DOCKER_REGISTRY }}
