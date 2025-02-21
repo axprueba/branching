@@ -14,11 +14,11 @@ jobs:
 
       - name: Obtener versión actual en `main`
         id: old_version
-        run: echo "OLD_VERSION=$(git show origin/main:version.txt)" >> $GITHUB_ENV
+        run: echo "OLD_VERSION=$(git show origin/main:VERSION)" >> $GITHUB_ENV
 
       - name: Obtener nueva versión en el PR
         id: new_version
-        run: echo "NEW_VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        run: echo "NEW_VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
       - name: Comparar versiones
         run: |

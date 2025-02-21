@@ -10,9 +10,9 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Leer versión desde version.txt
+      - name: Leer versión desde VERSION
         id: version
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
       - name: Retagear imagen
         run: |
