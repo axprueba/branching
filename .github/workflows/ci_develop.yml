@@ -44,16 +44,10 @@ jobs:
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_name || env.BRANCH_NAME }}
 
-      - name: Docker login
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}
-
-      - name: Build Docker image
-        run: |
-          echo "Building Docker image $IMAGE_URL"
-          docker build . -t $IMAGE_URL
-        
-      - name: Push Docker image
-        run: docker push $IMAGE_URL
+      - name: Docker build
+        uses: axprueba/workflows/.github/workflows/ci_build.yml@master
+        with:
+          image_url: ${{ env.IMAGE_URL }}
         
       - name: Deploy to Dev
         run: |

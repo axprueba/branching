@@ -1,0 +1,28 @@
+name: CI Build
+
+on:
+  workflow_call:
+    inputs:
+        image_url:
+            description: "Docker image URL"
+            required: true
+            type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+      - name: Docker login
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}
+
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image ${{ github.event.inputs.image_url }}"
+          docker build . -t ${{ github.event.inputs.image_url }}
+        
+      - name: Push Docker image
+        run: docker push ${{ github.event.inputs.image_url }}
