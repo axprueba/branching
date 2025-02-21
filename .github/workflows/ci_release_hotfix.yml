@@ -33,10 +33,10 @@ jobs:
 
           if [[ "$BRANCH_REF" =~ ^release/ ]]; then
             TAG="${BRANCH_REF#release/}-rc-${{ github.sha }}"
-            LATEST_TAG="${BRANCH_REF#release/}-rc-latest"
+            LATEST_TAG="${BRANCH_REF#release/}-rc"
           elif [[ "$BRANCH_REF" =~ ^hotfix/ ]]; then
             TAG="${BRANCH_REF#hotfix/}-hotfix-${{ github.sha }}"
-            LATEST_TAG="${BRANCH_REF#release/}-hotfix-latest"
+            LATEST_TAG="${BRANCH_REF#release/}-hotfix"
           else
             echo "No es una rama release/* ni hotfix/* => Saliendo."
             exit 1
