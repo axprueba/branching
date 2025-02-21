@@ -16,14 +16,22 @@ on:
 
 env:
   IMAGE_NAME: badiojulen/branching
-
+  
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug
+        run: |
+          echo "${{ vars.ENVIRON_VARIABLE }}"
+          echo "${{ vars.IMAGE_NAME }}"
+
   build-and-push:
     secrets: inherit
     uses: axprueba/branching/.github/workflows/ci_build.yml@develop
     with:
       docker_registry: ${{ vars.DOCKER_REGISTRY }}
-      image_name: ${{ env.IMAGE_NAME }}
+      image_name: ${{ vars.IMAGE_NAME }}
       tag: ${{ github.ref }}-${{ github.sha }}
   
   deploy:
