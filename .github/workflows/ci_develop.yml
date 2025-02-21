@@ -34,6 +34,7 @@ jobs:
           export BRANCH_NAME=$(echo ${{ github.ref }} | cut -d '/' -f 3)
           export REPOSITORY_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)
           echo "IMAGE_URL=$DOCKER_REGISTRY/$DOCKER_USERNAME/$REPOSITORY_NAME:$BRANCH_NAME-${{ github.sha }}"  >> $GITHUB_ENV
+          echo $IMAGE_URL
           
       - name: Check out repository
         uses: actions/checkout@v3
