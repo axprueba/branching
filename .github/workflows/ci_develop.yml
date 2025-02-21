@@ -15,7 +15,7 @@ on:
     
 
 env:
-  IMAGE_NAME: badiojulen/branching
+  IMAGE_NAME: badiolajulen/branching
   
 jobs:
   debug:
