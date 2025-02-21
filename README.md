@@ -75,3 +75,6 @@ main                => despliega a qa automaticamente v1.0.3-rc (el semver se co
 
 ### Drawbacks
 1. En main podría haber cambios 
+
+
+e
