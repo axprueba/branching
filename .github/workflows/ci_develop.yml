@@ -31,7 +31,7 @@ jobs:
     secrets: "inherit"
     with:
       docker_registry: ${{ vars.DOCKER_REGISTRY }}
-      image_name: ${{ vars.IMAGE_NAME }}
+      image_name: ${{ env.IMAGE_NAME }}
       tag: ${{ github.ref }}-${{ github.sha }}
   
   deploy:
