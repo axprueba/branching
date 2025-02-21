@@ -37,7 +37,7 @@ jobs:
           
       - name: Set more dynamic env variables
         run: |    
-          echo "IMAGE_URL=${{ env.DOCKER_REGISTRY }}/$DOCKER_USERNAME/${{ env.REPOSITORY_NAME}}:${{ env.BRANCH_NAME }}-${{ github.sha }}"  >> $GITHUB_ENV
+          echo "IMAGE_URL=$DOCKER_REGISTRY/$DOCKER_USERNAME/$REPOSITORY_NAME:$BRANCH_NAME-${{ github.sha }}"  >> $GITHUB_ENV
           
       - name: Check out repository
         uses: actions/checkout@v3
