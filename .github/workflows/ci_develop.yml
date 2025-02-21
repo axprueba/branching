@@ -18,7 +18,7 @@ env:
   IMAGE_NAME: badiolajulen/branching
   
 jobs:
-  build-and-push:
+  debug:
     runs-on: ubuntu-latest
     steps:
       - name: Debug
@@ -26,14 +26,13 @@ jobs:
           echo "${{ vars.ENVIRON_VARIABLE }}"
           echo "${{ vars.IMAGE_NAME }}"
 
-      - name: Push Docker image
-        uses: axprueba/branching/.github/workflows/ci_build.yml@develop
-        with:
-          docker_registry: ${{ vars.DOCKER_REGISTRY }}
-          docker_username: ${{ secrets.DOCKER_USERNAME }}
-          docker_password: ${{ secrets.DOCKER_PASSWORD }}
-          image_name: ${{ vars.IMAGE_NAME }}
-          tag: ${{ github.ref }}-${{ github.sha }}
+  build-and-push:
+    uses: axprueba/branching/.github/workflows/ci_build.yml@develop
+    secrets: "inherit"
+    with:
+      docker_registry: ${{ vars.DOCKER_REGISTRY }}
+      image_name: ${{ vars.IMAGE_NAME }}
+      tag: ${{ github.ref }}-${{ github.sha }}
   
   deploy:
     runs-on: ubuntu-latest
