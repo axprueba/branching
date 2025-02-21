@@ -45,7 +45,7 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_name || env.BRANCH_NAME }}
 
       - name: Docker build
-        uses: axprueba/workflows/.github/workflows/ci_build.yml@master
+        uses: axprueba/workflows/.github/workflows/ci_build.yml@develop
         with:
           image_url: ${{ env.IMAGE_URL }}
         
