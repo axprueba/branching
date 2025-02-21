@@ -21,8 +21,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "Building Docker image ${{ github.event.inputs.image_url }}"
-          docker build . -t ${{ github.event.inputs.image_url }}
+          echo "Building Docker image ${{ inputs.image_url }}"
+          docker build . -t ${{ inputs.image_url }}
         
       - name: Push Docker image
-        run: docker push ${{ github.event.inputs.image_url }}
+        run: docker push ${{ inputs.image_url }}
