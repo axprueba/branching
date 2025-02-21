@@ -19,7 +19,7 @@ jobs:
     env:
       DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Dump GitHub context
         env:
