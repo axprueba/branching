@@ -30,6 +30,9 @@ jobs:
           JOB_CONTEXT: ${{ toJson(job) }}
         run: echo "$JOB_CONTEXT"
 
+      - name: Get repository name
+        run: echo "REPOSITORY_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)" >> $GITHUB_ENV
+      
       - name: Check out repository
         uses: actions/checkout@v3
         with:
@@ -40,11 +43,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "Building Docker image ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }}"
-          docker build . -t ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }}
+          echo "Building Docker image ${{ env.DOCKER_REGISTRY }}/badiolajulen/${{ env.REPOSITORY_NAME}}:dev-${{ github.sha }}"
+          docker build . -t ${{ env.DOCKER_REGISTRY }}/badiolajulen/${{ env.REPOSITORY_NAME}}:dev-${{ github.sha }}
         
       - name: Push Docker image
-        run: docker push ${{ env.DOCKER_REGISTRY }}/${{ github.repository}}:dev-${{ github.sha }}
+        run: docker push ${{ env.DOCKER_REGISTRY }}/badiolajulen/${{ env.REPOSITORY_NAME}}:dev-${{ github.sha }}
         
       - name: Deploy to Dev
         run: |
