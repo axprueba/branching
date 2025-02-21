@@ -5,9 +5,13 @@ on:
     branches:
       - "release/*"
       - "hotfix/*"
-
+  pull_request:
+    branches:
+      - "release/*"
+      - "hotfix/*"
+    types: [opened, synchronize]
 jobs:
-  build-and-retag:
+  build:
     runs-on: ubuntu-latest
     env:
       ENVIRON_VARIABLE: ${{ vars.ENVIRON_VARIABLE }}
@@ -15,12 +19,14 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       IMAGE_NAME: "badiolajulen/branching"
+    outputs:
+      tag: ${{ steps.set-tag.outputs.tag }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
 
       - name: Extraer versión y tipo de rama
-        id: extract_version
+        id: set-tag
         run: |
           BRANCH_REF="${{ github.ref_name }}"
           echo "Branch ref: $BRANCH_REF"
@@ -43,3 +49,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           image_name: ${{ env.IMAGE_NAME }}
           tag: ${{ env.TAG }}
+    
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Dump GitHub context
+        run: echo "Desplegando imagen 'badiolajulen/branching:${{ needs.build.outputs.tag }}' a entorno de desarrollo"
