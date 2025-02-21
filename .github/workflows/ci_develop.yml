@@ -12,61 +12,23 @@ on:
         required: true
         default: "develop"
         type: string
+    
+
+env:
+  IMAGE_NAME: badiojulen/branching
 
 jobs:
-  initialize:
-    runs-on: ubuntu-latest
-    outputs:
-      image_url: ${{ steps.image_url.outputs.IMAGE_URL }}
-    env:
-      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-    steps:
-      # - name: Dump GitHub context
-      #   env:
-      #     GITHUB_CONTEXT: ${{ toJson(github) }}
-      #   run: echo "$GITHUB_CONTEXT"
-      # - name: Dump job context
-      #   env:
-      #     JOB_CONTEXT: ${{ toJson(job) }}
-      #   run: echo "$JOB_CONTEXT"
-      
-      - name: Set dynamic env variables
-        id: image_url
-        run: |
-          export BRANCH_NAME=$(echo ${{ github.ref }} | cut -d '/' -f 3)
-          export REPOSITORY_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)
-          export IMAGE_URL=$DOCKER_REGISTRY/$DOCKER_USERNAME/$REPOSITORY_NAME:$BRANCH_NAME-${{ github.sha }}
-          echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
-
-          # debug
-          echo $IMAGE_URL
-          echo $GITHUB_OUTPUT
-
-      - name: Check out repository
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_name || env.BRANCH_NAME }}
-  
-  echo:
-    runs-on: ubuntu-latest
-    needs: initialize
-    steps:
-      - name: Dump GitHub context
-        run: |
-          echo "Desplegando imagen $IMAGE_URL a entorno de desarrollo"
-          echo "Desplegando imagen ${{ needs.initialize.outputs.image_url }} a entorno de desarrollo"
-          
   build-and-push:
     secrets: inherit
-    needs: initialize
     uses: axprueba/branching/.github/workflows/ci_build.yml@develop
     with:
-      image_url: ${{ needs.initialize.outputs.image_url }}
+      docker_registry: ${{ vars.DOCKER_REGISTRY }}
+      image_name: ${{ env.IMAGE_NAME }}
+      tag: ${{ github.ref }}-${{ github.sha }}
   
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
       - name: Dump GitHub context
-        run: echo "Desplegando imagen  ${{ needs.initialize.outputs.image_url }} a entorno de desarrollo"
+        run: echo "Desplegando imagen '${{ env.IMAGE_NAME }}:${{ github.ref }}-${{ github.sha }}' a entorno de desarrollo"
