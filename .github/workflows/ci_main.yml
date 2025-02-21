@@ -21,10 +21,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Get version from VERSION.txt
+      - name: Get version from VERSION
         id: get-version
         run: |
-          VERSION=$(cat VERSION.txt)
+          VERSION=$(cat VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Extraer versión y tipo de rama

@@ -44,11 +44,11 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
-      # get version from VERSION.txt
-      - name: Get version from VERSION.txt
+      # get version from VERSION
+      - name: Get version from VERSION
         id: get-version
         run: |
-          VERSION=$(cat VERSION.txt)
+          VERSION=$(cat VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Check if production docker image exists
