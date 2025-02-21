@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_url: ${{ steps.set-image-url.outputs.IMAGE_URL }}
+    env:
+      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
     steps:
       # - name: Dump GitHub context
       #   env:
