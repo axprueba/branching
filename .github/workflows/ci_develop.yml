@@ -39,7 +39,7 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_name || 'develop' }}
 
       - name: Docker login
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}/
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}
 
       - name: Build Docker image
         run: |
