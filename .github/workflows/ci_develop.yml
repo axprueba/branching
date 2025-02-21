@@ -36,12 +36,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build . -t ${{ env.DOCKER_REGISTRY}}${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER}:dev-${{ github.sha }}
+          docker build . -t ${{ env.DOCKER_REGISTRY}}/${{ github.repository}}:dev-${{ github.sha }}
         
       - name: Push Docker image
-        run: docker push ${{ env.DOCKER_REGISTRY}}${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER}:dev-${{ github.sha }}
+        run: docker push ${{ env.DOCKER_REGISTRY}}/${{ github.repository}}:dev-${{ github.sha }}
         
       - name: Deploy to Dev
         run: |
-          echo "Desplegando imagen ${{ env.DOCKER_REGISTRY}}${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER}:dev-${{ github.sha }} a entorno de desarrollo"
+          echo "Desplegando imagen ${{ env.DOCKER_REGISTRY}}/${{ github.repository}}:dev-${{ github.sha }} a entorno de desarrollo"
         
