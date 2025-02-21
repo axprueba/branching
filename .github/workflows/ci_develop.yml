@@ -28,7 +28,7 @@ jobs:
     with:
       docker_registry: ${{ vars.DOCKER_REGISTRY }}
       image_name: "badiolajulen/branching"
-      tag: ${{ github.ref }}-${{ github.sha }}
+      tag: "${GITHUB_REF##*/}-${{ github.sha }}"
   
   deploy:
     runs-on: ubuntu-latest
