@@ -40,7 +40,7 @@ jobs:
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
 
           # debug
-          echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_ENV
+          echo $IMAGE_URL
           echo $GITHUB_OUTPUT
 
       - name: Check out repository
