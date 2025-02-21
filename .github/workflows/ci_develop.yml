@@ -13,10 +13,6 @@ on:
         default: "develop"
         type: string
     
-
-env:
-  IMAGE_NAME: badiolajulen/branching
-  
 jobs:
   debug:
     runs-on: ubuntu-latest
@@ -31,7 +27,7 @@ jobs:
     secrets: "inherit"
     with:
       docker_registry: ${{ vars.DOCKER_REGISTRY }}
-      image_name: ${{ env.IMAGE_NAME }}
+      image_name: "badiolajulen/branching"
       tag: ${{ github.ref }}-${{ github.sha }}
   
   deploy:
@@ -39,4 +35,4 @@ jobs:
     needs: build-and-push
     steps:
       - name: Dump GitHub context
-        run: echo "Desplegando imagen '${{ env.IMAGE_NAME }}:${{ github.ref }}-${{ github.sha }}' a entorno de desarrollo"
+        run: echo "Desplegando imagen 'badiolajulen/branching:${{ github.ref }}-${{ github.sha }}' a entorno de desarrollo"
