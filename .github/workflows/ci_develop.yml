@@ -14,12 +14,12 @@ on:
         type: string
 
 jobs:
-  build-and-push:
+  initialize:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    outputs:
+      branch_name: ${{ steps.set-branch.outputs.branch_name }}
+      repository_name: ${{ steps.set-repository.outputs.repository_name }}
+      image_url: ${{ steps.set-image-url.outputs.image_url }}
     steps:
       - name: Dump GitHub context
         env:
@@ -43,13 +43,17 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_name || env.BRANCH_NAME }}
-
-      - name: Docker build
-        uses: axprueba/workflows/.github/workflows/ci_build.yml@develop
-        with:
-          image_url: ${{ env.IMAGE_URL }}
-        
-      - name: Deploy to Dev
-        run: |
-          echo "Desplegando imagen $IMAGE_URL a entorno de desarrollo"
-        
+    
+  build-and-push:
+    secrets: inherit
+    needs: initialize
+    uses: axprueba/workflows/.github/workflows/ci_build.yml@develop
+    with:
+      image_url: ${{ needs.initialize.outputs.image_url }}
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Dump GitHub context
+        run: echo "Desplegando imagen $IMAGE_URL a entorno de desarrollo"
