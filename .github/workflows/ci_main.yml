@@ -1,0 +1,64 @@
+name: CI Main
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  retag-image:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true  # Solo si fue mergeado
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Extraer versión y tipo de rama
+        id: extract_version
+        run: |
+          BRANCH_REF="${{ github.event.pull_request.head.ref }}"
+          echo "Head ref (rama origen del PR) es: $BRANCH_REF"
+
+          if [[ "$BRANCH_REF" =~ ^release/ ]]; then
+            VERSION="${BRANCH_REF#release/}"
+            TAG_SUFFIX="-rc"
+
+          elif [[ "$BRANCH_REF" =~ ^hotfix/ ]]; then
+            VERSION="${BRANCH_REF#hotfix/}"
+            TAG_SUFFIX="-hotfix"
+
+          else
+            echo "No es una rama release/* ni hotfix/* => no se extrae versión"
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
+          echo "Se extrajo versión: $VERSION con sufijo $TAG_SUFFIX"
+
+      - name: Configurar variables de entorno
+        run: |
+          echo "OLD_TAG=${{ env.DOCKER_REGISTRY }}/${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER}:${{ env.VERSION }}${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
+          echo "NEW_TAG=${{ env.DOCKER_REGISTRY }}/${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER}:${{ env.VERSION }}" >> $GITHUB_ENV
+
+      - name: Docker login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin ${{ env.DOCKER_REGISTRY }}
+
+      - name: Retag Docker Image
+        run: |
+          echo "Retageando imagen $OLD_TAG -> $NEW_TAG"
+
+          # Descargar la imagen con el tag correspondiente (-rc o -hotfix)
+          docker pull $OLD_TAG
+
+          # Crear el nuevo tag sin sufijo (-rc o -hotfix)
+          docker tag $OLD_TAG $NEW_TAG
+
+          # Subir la imagen con el nuevo tag
+          docker push $NEW_TAG
+
+      - name: Deploy to Production
+        run: |
+          echo "Desplegando imagen $NEW_TAG a entorno de producción"

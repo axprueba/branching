@@ -1,0 +1,25 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Leer versión desde version.txt
+        id: version
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
+      - name: Retagear imagen
+        run: |
+          docker pull myrepo/myapp:${{ env.VERSION }}-rc
+          docker tag myrepo/myapp:${{ env.VERSION }}-rc myrepo/myapp:${{ env.VERSION }}
+          docker push myrepo/myapp:${{ env.VERSION }}
+
+      - name: Desplegar a Producción
+        run: |
+          kubectl set image deployment/myapp myapp=myrepo/myapp:${{ env.VERSION }} --namespace=prod

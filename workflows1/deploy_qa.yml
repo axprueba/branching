@@ -1,0 +1,26 @@
+name: Deploy to QA
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Leer versión desde version.txt
+        id: version
+        run: echo "VERSION=$(cat version.txt)-rc" >> $GITHUB_ENV
+
+      - name: Build y push imagen
+        run: |
+          docker build -t myrepo/myapp:${{ env.VERSION }} .
+          docker push myrepo/myapp:${{ env.VERSION }}
+
+      - name: Desplegar a QA
+        run: |
+          kubectl set image deployment/myapp myapp=myrepo/myapp:${{ env.VERSION }} --namespace=qa

@@ -1,0 +1,31 @@
+name: Deploy to Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch a desplegar'
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Obtener el hash del commit
+        id: vars
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build y push imagen
+        run: |
+          docker build -t myrepo/myapp:rc-${{ github.event.inputs.branch }}-${{ env.COMMIT_HASH }} .
+          docker push myrepo/myapp:rc-${{ github.event.inputs.branch }}-${{ env.COMMIT_HASH }}
+
+      - name: Desplegar a Test
+        run: |
+          kubectl set image deployment/myapp myapp=myrepo/myapp:rc-${{ github.event.inputs.branch }}-${{ env.COMMIT_HASH }} --namespace=test

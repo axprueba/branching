@@ -1,0 +1,40 @@
+name: Validate Version Bump
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Obtener versión actual en `main`
+        id: old_version
+        run: echo "OLD_VERSION=$(git show origin/main:version.txt)" >> $GITHUB_ENV
+
+      - name: Obtener nueva versión en el PR
+        id: new_version
+        run: echo "NEW_VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
+      - name: Comparar versiones
+        run: |
+          OLD_VERSION=${{ env.OLD_VERSION }}
+          NEW_VERSION=${{ env.NEW_VERSION }}
+
+          # Verificar que la nueva versión sigue el formato SemVer
+          if [[ ! $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: La nueva versión '$NEW_VERSION' no sigue el formato SemVer (X.Y.Z)"
+            exit 1
+          fi
+
+          # Comparar versiones usando `sort -V`
+          if [ "$(printf '%s\n' "$OLD_VERSION" "$NEW_VERSION" | sort -V | tail -n 1)" != "$NEW_VERSION" ]; then
+            echo "Error: La nueva versión '$NEW_VERSION' no es mayor que la actual '$OLD_VERSION'."
+            exit 1
+          fi
+
+          echo "✅ Validación exitosa: La nueva versión '$NEW_VERSION' es mayor que la actual '$OLD_VERSION'."
