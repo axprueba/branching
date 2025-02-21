@@ -7,22 +7,35 @@ on:
             description: "Docker image URL"
             required: true
             type: string
+        should_be_inmutable:
+            description: "Should be inmutable"
+            required: false
+            default: false
+            type: boolean
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    steps:
-      - name: Docker login
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}
-
-      - name: Build Docker image
-        run: |
-          echo "Building Docker image ${{ inputs.image_url }}"
-          docker build . -t ${{ inputs.image_url }}
+    build-and-push:
+        runs-on: ubuntu-latest
+        env:
+            DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+            DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+            DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        steps:
+            - name: Docker login
+              run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ${{ env.DOCKER_REGISTRY }}
         
-      - name: Push Docker image
-        run: docker push ${{ inputs.image_url }}
+            - name: Check if the image already exists
+              if: ${{ inputs.should_be_inmutable == true }}
+              run: |
+                echo "Checking if the image ${{ inputs.image_url }} already exists"
+                docker pull ${{ inputs.image_url }}
+                echo "Image ${{ inputs.image_url }} already exists"
+                exit 1
+
+            - name: Build Docker image
+              run: |
+                echo "Building Docker image ${{ inputs.image_url }}"
+                docker build . -t ${{ inputs.image_url }}
+                
+            - name: Push Docker image
+              run: docker push ${{ inputs.image_url }}
