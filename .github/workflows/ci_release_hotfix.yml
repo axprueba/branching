@@ -1,11 +1,10 @@
 name: CI Hotfix & Release
 
 on:
-  pull_request:
+  push:
     branches:
       - "release/*"
       - "hotfix/*"
-    types: [opened, synchronize]
 
 jobs:
   build-and-retag:
