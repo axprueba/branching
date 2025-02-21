@@ -10,6 +10,12 @@ on:
 jobs:
   build-and-retag:
     runs-on: ubuntu-latest
+    env:
+      ENVIRON_VARIABLE: ${{ vars.ENVIRON_VARIABLE }}
+      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      IMAGE_NAME: "badiolajulen/branching"
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -21,34 +27,20 @@ jobs:
           echo "Branch ref: $BRANCH_REF"
 
           if [[ "$BRANCH_REF" =~ ^release/ ]]; then
-            VERSION="${BRANCH_REF#release/}"
-            TAG_SUFFIX="-rc"
-
+            TAG="${BRANCH_REF#release/}-rc"
           elif [[ "$BRANCH_REF" =~ ^hotfix/ ]]; then
-            VERSION="${BRANCH_REF#hotfix/}"
-            TAG_SUFFIX="-hotfix"
-
+            TAG="${BRANCH_REF#hotfix/}-hotfix"
           else
             echo "No es una rama release/* ni hotfix/* => Saliendo."
             exit 1
           fi
-
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
-          echo "Se extrae versión: $VERSION con sufijo $TAG_SUFFIX"
-
-      - name: Configurar variables de entorno
-        run: |
-          echo "DOCKER_REGISTRY=your-registry.io" >> $GITHUB_ENV
-          echo "IMAGE_NAME=my-app" >> $GITHUB_ENV
-          echo "FINAL_TAG=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}" >> $GITHUB_ENV
-          echo "TEMP_TAG=${{ env.FINAL_TAG }}${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
-
-      - name: Docker login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin ${{ env.DOCKER_REGISTRY }}
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Build & Push Docker Image
-        run: |
-          echo "Construyendo y pusheando imagen con tag temporal: $TEMP_TAG"
-          docker build . -t $TEMP_TAG
-          docker push $TEMP_TAG
+        uses: axprueba/workflows/actions/docker-build-push@master
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          image_name: ${{ env.IMAGE_NAME }}
+          tag: ${{ env.TAG }}
