@@ -27,6 +27,15 @@ jobs:
           VERSION=$(cat VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Check if production docker image exists
+        uses: axprueba/workflows/actions/docker-check-if-image-exists@master
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          image_name: ${{ env.IMAGE_NAME }}
+          tag: ${{ env.VERSION }}
+          
       - name: Extraer versión y tipo de rama
         run: |
           BRANCH_REF="${{ github.event.pull_request.head.ref }}"
@@ -44,23 +53,15 @@ jobs:
           fi
           echo "TAG_SUFFIX=$TAG_SUFFIX" >> $GITHUB_ENV
 
-      - name: Configurar variables de entorno
-        run: |
-          echo "OLD_TAG=${{ vars.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.VERSION }}${{ env.TAG_SUFFIX }}" >> $GITHUB_ENV
-          echo "NEW_TAG=${{ vars.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.VERSION }}" >> $GITHUB_ENV
-
-      - name: Retag Docker Image
-        run: |
-          echo "Retageando imagen $OLD_TAG -> $NEW_TAG"
-
-          # Descargar la imagen con el tag correspondiente (-rc o -hotfix)
-          docker pull $OLD_TAG
-
-          # Crear el nuevo tag sin sufijo (-rc o -hotfix)
-          docker tag $OLD_TAG $NEW_TAG
-
-          # Subir la imagen con el nuevo tag
-          docker push $NEW_TAG
+      - name: Add latest tag to image
+        uses: axprueba/workflows/actions/docker-retag@master
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          image_name: ${{ env.IMAGE_NAME }}
+          old_tag: ${{ vars.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.VERSION }}${{ env.TAG_SUFFIX }}
+          new_tag: ${{ vars.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.VERSION }}
 
       - name: Deploy to Production
         run: |
